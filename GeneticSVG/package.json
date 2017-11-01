@@ -1,0 +1,12 @@
+{
+  "name": "genetic-svg",
+  "version": "0.0.0",
+  "description": "GeneticSVG",
+  "main": "app.js",
+  "author": {
+    "name": "tomas"
+  },
+  "devDependencies": {
+    "@types/node": "^6.0.87"
+  }
+}
