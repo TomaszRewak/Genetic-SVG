@@ -1,4 +1,7 @@
 # Genetic SVG
+
+Work in progress :)
+
 A heuristic based on genetic algorithm designed to generate SVG images from raster ones.
 
 ![Example](https://raw.githubusercontent.com/TomaszRewak/Genetic-SVG/master/GeneticSVG/examples/apple.png)
