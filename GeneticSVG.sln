@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "GeneticSVG", "GeneticSVG\GeneticSVG.njsproj", "{4D9B08A0-8BD0-46CB-8944-F3E9F01AC0FF}"
 EndProject

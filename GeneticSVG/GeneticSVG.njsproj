@@ -12,7 +12,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>4d9b08a0-8bd0-46cb-8944-f3e9f01ac0ff</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>server.ts</StartupFile>
+    <StartupFile>server/dist/server.js</StartupFile>
     <StartWebBrowser>True</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -25,7 +25,7 @@
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
     <TypeScriptToolsVersion>2.3</TypeScriptToolsVersion>
     <EnableTypeScript>true</EnableTypeScript>
-    <StartWebBrowser>true</StartWebBrowser>
+    <StartWebBrowser>True</StartWebBrowser>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,10 +34,139 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="server.ts" />
-    <Content Include="tsconfig.json" />
-    <Content Include="package.json" />
+    <Content Include="public\index.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="public\js\react.js.map" />
+    <Content Include="server\package.json" />
+    <Content Include="server\tsconfig.json" />
+    <Content Include="site\package.json" />
+    <Content Include="site\tsconfig.json" />
     <Content Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="public\" />
+    <Folder Include="public\js\" />
+    <Folder Include="server\" />
+    <Folder Include="server\src\" />
+    <Folder Include="site\" />
+    <Folder Include="site\src\" />
+    <Folder Include="site\src\algorithm\svg-processing\" />
+    <Folder Include="site\src\algorithm\svg-processing\evaluation\" />
+    <Folder Include="site\src\algorithm\svg-processing\pipeline\" />
+    <Folder Include="site\src\components\" />
+    <Folder Include="site\src\algorithm\" />
+    <Folder Include="site\src\algorithm\images\" />
+    <Folder Include="site\src\algorithm\images\algorithms\" />
+    <Folder Include="site\src\algorithm\images\raster\" />
+    <Folder Include="site\src\algorithm\images\svg\" />
+    <Folder Include="site\src\algorithm\images\svg\shapes\" />
+    <Folder Include="site\src\algorithm\genetic-algorithm\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="server\src\server.ts" />
+    <TypeScriptCompile Include="site\src\algorithm\images\algorithms\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\raster\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\svg\shapes\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\svg\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\_interfaces.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\evaluation\evaluator.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\evaluation\layer.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\evaluation\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\pipeline\polygon-mutation.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\pipeline\ring-selection.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\pipeline\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\specimen.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\svg-genetic-algorithm.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\_imports.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\_interfaces.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\components\algorithm.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\components\image-selector.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\components\image-viewer.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\genetic-algorithm\genetic-algorithm.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\genetic-algorithm\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\genetic-algorithm\_interfaces.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\genetic-algorithm\population.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\algorithms\image-color-selector.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\raster\raster-image.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\genetic-svg.ts" />
+    <TypeScriptCompile Include="site\src\algorithm\images\algorithms\image-comparer.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\svg\svg-image.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\svg\shapes\polygon.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\svg\_interfaces.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\components\_imports.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\site.tsx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="public\js\dependencies.js" />
+    <Compile Include="public\js\react.js" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

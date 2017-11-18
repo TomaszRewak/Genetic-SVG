@@ -1,0 +1,19 @@
+{
+	"compileOnSave": true,
+	"compilerOptions": {
+		"module": "amd",
+		"target": "es6",
+		"lib": [ "es6", "dom" ],
+		"sourceMap": true,
+		"outFile": "../public/js/react.js",
+		"noImplicitAny": true,
+		"jsx": "react",
+		"alwaysStrict": true
+	},
+	"include": [
+		"./src/**/*"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}
