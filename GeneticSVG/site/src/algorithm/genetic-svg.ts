@@ -4,40 +4,27 @@ import * as Svg from './svg-processing/_index'
 
 type Specimen = Svg.Specimen<Image.Svg.Shapes.Polygon>;
 
-export default class GeneticSvg {
-	private layers: GA.IGeneticAlgorithm<Specimen>[];
-	private evaluator: Svg.Evaluator;
-	private image: ImageData;
+export default abstract class GeneticSvg {
+	protected layers: GA.GeneticAlgorithm<Specimen>[];
+	protected evaluator: Svg.Evaluator;
+	protected image: ImageData;
 
 	public constructor(
-		image: Image.IImage,
-		layers: number
-	) {
-		let width = image.width,
-			height = image.height;
-
-		this.layers = [];
-		
+		image: Image.IImage
+	) {		
 		this.image = image.getImageData();
 		this.evaluator = new Svg.Evaluator(this.image);
+	}
+
+	protected abstract getPipeline(layer: number): GA.IPipelineGenerator<Specimen>[];
+	protected abstract generatePopulation(layer: number): GA.Population<Specimen>;
+
+	protected initialize(layers: number): void {
+		this.layers = [];
 
 		for (let i = 0; i < layers; i++) {
-			let pipeline: GA.IPipelineGenerator<Specimen>[] = [
-				new Svg.Pipeline.RingSelection<Image.Svg.Shapes.Polygon>(10),
-				new Svg.Pipeline.PolygonMutation()
-			];
-
-			let population = new GA.Population<Specimen>();
-			for (let i = 0; i < 10; i++) {
-				let polygon = new Image.Svg.Shapes.Polygon(3);
-
-				for (let j = 0; j < 3; j++) {
-					polygon.setX(j, width * Math.random());
-					polygon.setY(j, height * Math.random());
-				}
-
-				population.push(new Svg.Specimen<Image.Svg.Shapes.Polygon>(polygon));
-			}
+			let pipeline = this.getPipeline(i);
+			let population = this.generatePopulation(i);
 
 			let ga = new Svg.SvgGeneticAlgorithm<Image.Svg.Shapes.Polygon>(pipeline, population, this.evaluator, this.layers);
 

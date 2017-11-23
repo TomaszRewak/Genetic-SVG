@@ -62,6 +62,7 @@
     <Folder Include="site\src\algorithm\images\svg\" />
     <Folder Include="site\src\algorithm\images\svg\shapes\" />
     <Folder Include="site\src\algorithm\genetic-algorithm\" />
+    <Folder Include="site\src\implementation\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="server\src\server.ts" />
@@ -162,11 +163,20 @@
     <TypeScriptCompile Include="site\src\components\_imports.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\implementation\_imports.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\implementation\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\site.tsx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="public\js\dependencies.js" />
     <Compile Include="public\js\react.js" />
+    <Compile Include="site\src\implementation\configurable-genetic-algorithm.ts">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

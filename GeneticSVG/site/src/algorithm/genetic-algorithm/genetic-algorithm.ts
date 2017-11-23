@@ -14,6 +14,7 @@ export default abstract class GeneticAlgorithm<Specimen extends I.ISpecimen> imp
 	}
 
 	public get currentPopulation() { return this._currentPopulation; }
+	public set pipeline(value: I.IPipelineGenerator<Specimen>[]) { this._pipeline = value; }
 
 	public setp(): void {
 		let newPopulation = new Population<Specimen>();

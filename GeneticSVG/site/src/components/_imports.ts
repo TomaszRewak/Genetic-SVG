@@ -1,1 +1,1 @@
-﻿export * from '../algorithm/_index'
+﻿export * from '../implementation/_index'

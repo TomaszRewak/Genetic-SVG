@@ -5,6 +5,7 @@ type S = Specimen<Images.Svg.Shapes.Polygon>;
 
 class Mutation implements GA.IPipelineStep<S> {
 	public constructor(
+		private annealing: number,
 		private ga: GA.IGeneticAlgorithm<S>,
 		private next: GA.IPipelineStep<S>
 	)
@@ -15,6 +16,7 @@ class Mutation implements GA.IPipelineStep<S> {
 
 		let polygon = specimen.shape;
 		let length = polygon.length;
+		let annealing = this.annealing;
 		let newPolygon = new Images.Svg.Shapes.Polygon(length);
 
 		for (let i = 0; i < length; i++) {
@@ -22,13 +24,13 @@ class Mutation implements GA.IPipelineStep<S> {
 				x1 = polygon.getX(i),
 				x2 = polygon.getX(i + 1);
 
-			newPolygon.setX(i, x0 + Math.max(Math.abs(x0 - x1), Math.abs(x1 - x2)) * 0.3 * (Math.random() - 0.5));
+			newPolygon.setX(i, x0 + Math.max(Math.abs(x0 - x1), Math.abs(x1 - x2)) * annealing * (Math.random() - 0.5));
 
 			let y0 = polygon.getY(i - 1),
 				y1 = polygon.getY(i),
 				y2 = polygon.getY(i + 1);
 
-			newPolygon.setY(i, y0 + Math.max(Math.abs(y0 - y1), Math.abs(y1 - y2)) * 0.3 * (Math.random() - 0.5));
+			newPolygon.setY(i, y0 + Math.max(Math.abs(y0 - y1), Math.abs(y1 - y2)) * annealing * (Math.random() - 0.5));
 		}
 
 		return new Specimen<Images.Svg.Shapes.Polygon>(newPolygon);
@@ -36,7 +38,10 @@ class Mutation implements GA.IPipelineStep<S> {
 }
 
 export default class PolygonMutationGenerator implements GA.IPipelineGenerator<Specimen<Images.Svg.Shapes.Polygon>> {
+	constructor(private annealing: number) {
+	}
+
 	generate(ga: GA.IGeneticAlgorithm<S>, next: GA.IPipelineStep<S>): GA.IPipelineStep<S> {
-		return new Mutation(ga, next);
+		return new Mutation(this.annealing, ga, next);
 	}
 }

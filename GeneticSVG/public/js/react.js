@@ -18,6 +18,7 @@ define("algorithm/genetic-algorithm/genetic-algorithm", ["require", "exports", "
             this._currentPopulation = initialPopulation;
         }
         get currentPopulation() { return this._currentPopulation; }
+        set pipeline(value) { this._pipeline = value; }
         setp() {
             let newPopulation = new population_1.default();
             this._best = null;
@@ -352,7 +353,8 @@ define("algorithm/svg-processing/pipeline/polygon-mutation", ["require", "export
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Mutation {
-        constructor(ga, next) {
+        constructor(annealing, ga, next) {
+            this.annealing = annealing;
             this.ga = ga;
             this.next = next;
         }
@@ -360,19 +362,23 @@ define("algorithm/svg-processing/pipeline/polygon-mutation", ["require", "export
             let specimen = this.next.getNext();
             let polygon = specimen.shape;
             let length = polygon.length;
+            let annealing = this.annealing;
             let newPolygon = new _imports_3.Images.Svg.Shapes.Polygon(length);
             for (let i = 0; i < length; i++) {
                 let x0 = polygon.getX(i - 1), x1 = polygon.getX(i), x2 = polygon.getX(i + 1);
-                newPolygon.setX(i, x0 + Math.max(Math.abs(x0 - x1), Math.abs(x1 - x2)) * 0.3 * (Math.random() - 0.5));
+                newPolygon.setX(i, x0 + Math.max(Math.abs(x0 - x1), Math.abs(x1 - x2)) * annealing * (Math.random() - 0.5));
                 let y0 = polygon.getY(i - 1), y1 = polygon.getY(i), y2 = polygon.getY(i + 1);
-                newPolygon.setY(i, y0 + Math.max(Math.abs(y0 - y1), Math.abs(y1 - y2)) * 0.3 * (Math.random() - 0.5));
+                newPolygon.setY(i, y0 + Math.max(Math.abs(y0 - y1), Math.abs(y1 - y2)) * annealing * (Math.random() - 0.5));
             }
             return new specimen_1.default(newPolygon);
         }
     }
     class PolygonMutationGenerator {
+        constructor(annealing) {
+            this.annealing = annealing;
+        }
         generate(ga, next) {
-            return new Mutation(ga, next);
+            return new Mutation(this.annealing, ga, next);
         }
     }
     exports.default = PolygonMutationGenerator;
@@ -420,29 +426,19 @@ define("algorithm/svg-processing/_index", ["require", "exports", "algorithm/svg-
     exports.Pipeline = Pipeline;
     exports.Evaluator = _index_2.Evaluator;
 });
-define("algorithm/genetic-svg", ["require", "exports", "algorithm/genetic-algorithm/_index", "algorithm/images/_index", "algorithm/svg-processing/_index"], function (require, exports, GA, Image, Svg) {
+define("algorithm/genetic-svg", ["require", "exports", "algorithm/images/_index", "algorithm/svg-processing/_index"], function (require, exports, Image, Svg) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class GeneticSvg {
-        constructor(image, layers) {
-            let width = image.width, height = image.height;
-            this.layers = [];
+        constructor(image) {
             this.image = image.getImageData();
             this.evaluator = new Svg.Evaluator(this.image);
+        }
+        initialize(layers) {
+            this.layers = [];
             for (let i = 0; i < layers; i++) {
-                let pipeline = [
-                    new Svg.Pipeline.RingSelection(10),
-                    new Svg.Pipeline.PolygonMutation()
-                ];
-                let population = new GA.Population();
-                for (let i = 0; i < 10; i++) {
-                    let polygon = new Image.Svg.Shapes.Polygon(3);
-                    for (let j = 0; j < 3; j++) {
-                        polygon.setX(j, width * Math.random());
-                        polygon.setY(j, height * Math.random());
-                    }
-                    population.push(new Svg.Specimen(polygon));
-                }
+                let pipeline = this.getPipeline(i);
+                let population = this.generatePopulation(i);
                 let ga = new Svg.SvgGeneticAlgorithm(pipeline, population, this.evaluator, this.layers);
                 this.layers.push(ga);
             }
@@ -474,13 +470,69 @@ define("algorithm/_index", ["require", "exports", "algorithm/genetic-svg", "algo
     exports.Image = Image;
     exports.Svg = Svg;
 });
-define("components/_imports", ["require", "exports", "algorithm/_index"], function (require, exports, _index_3) {
+define("implementation/_imports", ["require", "exports", "algorithm/_index"], function (require, exports, _index_3) {
     "use strict";
     function __export(m) {
         for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
     }
     Object.defineProperty(exports, "__esModule", { value: true });
     __export(_index_3);
+});
+define("implementation/configurable-genetic-algorithm", ["require", "exports", "implementation/_imports"], function (require, exports, _imports_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class ConfigurableGeneticAlgorithm extends _imports_4.GeneticSvg {
+        constructor(image, configuration) {
+            super(image);
+            this.configuration = configuration;
+            this.initialize(configuration.layers);
+        }
+        getPipeline(layer) {
+            let pipeline = [
+                new _imports_4.Svg.Pipeline.RingSelection(10),
+                new _imports_4.Svg.Pipeline.PolygonMutation(this.configuration.annealing)
+            ];
+            return pipeline;
+        }
+        generatePopulation(layer) {
+            let vertices = this.configuration.vertices;
+            let size = this.configuration.population;
+            let population = new _imports_4.GA.Population();
+            for (let i = 0; i < size; i++) {
+                let polygon = new _imports_4.Image.Svg.Shapes.Polygon(vertices);
+                for (let j = 0; j < vertices; j++) {
+                    polygon.setX(j, this.image.width * Math.random());
+                    polygon.setY(j, this.image.height * Math.random());
+                }
+                population.push(new _imports_4.Svg.Specimen(polygon));
+            }
+            return population;
+        }
+        updateConfiguration(configuration) {
+            this.configuration = configuration;
+            for (let i = 0; i < this.layers.length; i++) {
+                this.layers[i].pipeline = this.getPipeline(i);
+            }
+        }
+    }
+    exports.ConfigurableGeneticAlgorithm = ConfigurableGeneticAlgorithm;
+});
+define("implementation/_index", ["require", "exports", "implementation/_imports", "implementation/configurable-genetic-algorithm"], function (require, exports, _imports_5, configurable_genetic_algorithm_1) {
+    "use strict";
+    function __export(m) {
+        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    }
+    Object.defineProperty(exports, "__esModule", { value: true });
+    __export(_imports_5);
+    __export(configurable_genetic_algorithm_1);
+});
+define("components/_imports", ["require", "exports", "implementation/_index"], function (require, exports, _index_4) {
+    "use strict";
+    function __export(m) {
+        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    }
+    Object.defineProperty(exports, "__esModule", { value: true });
+    __export(_index_4);
 });
 define("components/image-viewer", ["require", "exports", "react"], function (require, exports, React) {
     "use strict";
@@ -496,17 +548,24 @@ define("components/image-viewer", ["require", "exports", "react"], function (req
     }
     exports.ImageViewer = ImageViewer;
 });
-define("components/algorithm", ["require", "exports", "react", "components/image-viewer", "components/_imports"], function (require, exports, React, image_viewer_1, SvgGenerator) {
+define("components/algorithm", ["require", "exports", "react", "components/image-viewer", "components/_imports"], function (require, exports, React, image_viewer_1, GA) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Algorithm extends React.Component {
         constructor(props) {
             super(props);
-            this._geneticAlgorithm = new SvgGenerator.GeneticSvg(props.image, 33);
+            this.setLayers = this._setLayers.bind(this);
+            this.setVertices = this._setVertices.bind(this);
+            this.setAnnealing = this._setAnnealing.bind(this);
             this.state = {
                 generation: -1,
-                paused: false
+                paused: false,
+                layers: '40',
+                population: '10',
+                vertices: '4',
+                annealing: '0.5'
             };
+            this._geneticAlgorithm = new GA.ConfigurableGeneticAlgorithm(props.image, this.getConfiguration());
             this.start = this.start.bind(this);
             this.pause = this.pause.bind(this);
         }
@@ -527,11 +586,34 @@ define("components/algorithm", ["require", "exports", "react", "components/image
         pause() {
             this.setState({ paused: true });
         }
+        getConfiguration() {
+            return {
+                annealing: Number(this.state.annealing),
+                layers: Number(this.state.layers),
+                population: Number(this.state.population),
+                vertices: Number(this.state.vertices)
+            };
+        }
+        _setLayers(event) { this.setState({ layers: event.target.value }, () => { this.updateGA(); }); }
+        _setVertices(event) { this.setState({ vertices: event.target.value }, () => { this.updateGA(); }); }
+        _setAnnealing(event) { this.setState({ annealing: event.target.value }, () => { this.updateGA(); }); }
+        updateGA() {
+            this._geneticAlgorithm.updateConfiguration(this.getConfiguration());
+        }
         render() {
             return (React.createElement("div", null,
                 React.createElement("div", null,
                     React.createElement("button", { onClick: this.start }, "Start"),
-                    React.createElement("button", { onClick: this.pause }, "Pause")),
+                    React.createElement("button", { onClick: this.pause }, "Pause"),
+                    React.createElement("div", null,
+                        React.createElement("div", null, "layers: "),
+                        React.createElement("input", { type: "text", value: this.state.layers, onChange: this.setLayers })),
+                    React.createElement("div", null,
+                        React.createElement("div", null, "vertices: "),
+                        React.createElement("input", { type: "text", value: this.state.vertices, onChange: this.setVertices })),
+                    React.createElement("div", null,
+                        React.createElement("div", null, "annealing: "),
+                        React.createElement("input", { type: "text", value: this.state.annealing, onChange: this.setAnnealing }))),
                 React.createElement("div", null,
                     "Generation: ",
                     this.state.generation),
