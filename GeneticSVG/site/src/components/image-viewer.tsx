@@ -4,7 +4,7 @@ import * as SvgGenerator from './_imports'
 type Props = { image: SvgGenerator.Image.IImage };
 type State = {};
 
-export class ImageViewer extends React.Component<Props, State>
+export default class ImageViewer extends React.Component<Props, State>
 {
 	render() {
 		if (!this.props.image)

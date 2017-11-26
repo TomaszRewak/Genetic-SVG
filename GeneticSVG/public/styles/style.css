@@ -1,0 +1,16 @@
+﻿body {
+	background-color: darkgray;
+}
+
+.algorithm {
+	display: grid;
+}
+
+.flow-control {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.flow-control > button {
+
+}

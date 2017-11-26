@@ -28,7 +28,7 @@ export default class SvgGeneticAlgorithm<Shape extends Images.Svg.ISvgShape> ext
 	private currentLayer: number;
 	private layers: Layer[];
 
-	public setp(): void {
+	public step(): void {
 		let shapes = this.environment.map(e => e.best.shape);
 		this.layers = shapes.map((v, i) => new Layer(v, this.evaluator.getLayerColor(shapes, i)));
 
@@ -36,6 +36,6 @@ export default class SvgGeneticAlgorithm<Shape extends Images.Svg.ISvgShape> ext
 			if (this.environment[i] == this)
 				this.currentLayer = i;
 
-		super.setp();
+		super.step();
 	}
 }

@@ -17,7 +17,7 @@
 		let bytes = pixels1.length;
 
 		for (let i = 0; i < bytes; i++)
-			diff += Math.pow(Math.abs(pixels1[i] - pixels2[i]) / 256, 2);
+			diff += Math.pow(Math.abs(pixels1[i] - pixels2[i]) / 256, 3);
 
 		return diff / bytes;
 	}

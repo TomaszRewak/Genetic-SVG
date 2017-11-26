@@ -38,6 +38,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="public\js\react.js.map" />
+    <Content Include="public\styles\style.css">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="server\package.json" />
     <Content Include="server\tsconfig.json" />
     <Content Include="site\package.json" />
@@ -47,6 +50,7 @@
   <ItemGroup>
     <Folder Include="public\" />
     <Folder Include="public\js\" />
+    <Folder Include="public\styles\" />
     <Folder Include="server\" />
     <Folder Include="server\src\" />
     <Folder Include="site\" />
@@ -66,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="server\src\server.ts" />
+    <TypeScriptCompile Include="site\src\algorithm\images\algorithms\image-measurer.ts" />
     <TypeScriptCompile Include="site\src\algorithm\images\algorithms\_index.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -174,6 +179,15 @@
   <ItemGroup>
     <Compile Include="public\js\dependencies.js" />
     <Compile Include="public\js\react.js" />
+    <Compile Include="site\src\components\algorithm-configuration.tsx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="site\src\components\flow-control.tsx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="site\src\components\algorithm-log.tsx">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="site\src\implementation\configurable-genetic-algorithm.ts">
       <SubType>Code</SubType>
     </Compile>

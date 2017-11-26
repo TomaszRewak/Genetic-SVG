@@ -32,24 +32,50 @@ export default abstract class GeneticSvg {
 		}
 	}
 
-	public step(): void {
+	public *step(): Generator {
 		for (let layer of this.layers) {
-			layer.setp();
+			this._bestImage = null;
+			this._bestScore = 0;
+
+			layer.step();
+
+			yield;
 		}
+
+		//this.sort();
 	}
 
+	private sort(): void {
+		this.layers = this
+			.layers
+			.map(l => ({ layer: l, size: this.evaluator.getSize(l.best.shape) }))
+			.sort((a, b) => b.size - a.size)
+			.map(l => l.layer);
+	}
+
+	private _bestImage: Image.IImage;
+	private _bestScore: number;
+
 	public get bestImage(): Image.IImage {
-		let image = new Image.Svg.SvgImage(this.image.width, this.image.height);
-		image.clear('#ffffff');
+		if (this._bestImage == null) {
+			let image = new Image.Svg.SvgImage(this.image.width, this.image.height);
+			image.clear('#ffffff');
 
-		let shapes = this.layers.map(l => l.best.shape);
-		for (let i = 0; i < shapes.length; i++)
-			image.add(shapes[i], this.evaluator.getLayerColor(shapes, i));
+			let shapes = this.layers.map(l => l.best.shape);
+			for (let i = 0; i < shapes.length; i++)
+				image.add(shapes[i], this.evaluator.getLayerColor(shapes, i));
 
-		return image;
+			this._bestImage = image;
+		}
+
+		return this._bestImage;
 	}
 
 	public get bestScore(): number {
-		return 0;
+		if (!this._bestScore) {
+			this._bestScore = this.evaluator.compare(this.bestImage);
+		}
+
+		return this._bestScore;
 	}
 }

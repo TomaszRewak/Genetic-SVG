@@ -1,6 +1,6 @@
 ﻿import * as React from 'react'
-import { ImageViewer } from "./image-viewer";
-import { Algorithm } from "./algorithm";
+import ImageViewer from "./image-viewer";
+import Algorithm from "./algorithm";
 import * as SvgGenerator from './_imports'
 
 type Props = {};
@@ -32,7 +32,6 @@ export class ImageSelector extends React.Component<Props, State> {
 
 		return (
 			<div>
-				<ImageViewer image={this._image} />
 				<Algorithm image={this._image} />
 			</div>
 		);

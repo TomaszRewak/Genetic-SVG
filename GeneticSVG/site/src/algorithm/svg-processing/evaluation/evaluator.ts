@@ -8,6 +8,26 @@ export default class Evaluator {
 	) {
 	}
 
+	public compare(image: Images.IImage) {
+		let comparer = new Images.Algorithms.ImageComparer();
+
+		let diff = comparer.compare(this.image, image.getImageData());
+
+		return diff;
+	}
+
+	public getSize(shape: Images.Svg.ISvgShape): number {
+		let measurer = new Images.Algorithms.ImageMeasurer();
+		let mask = new Images.Svg.SvgImage(this.image.width, this.image.height);
+
+		mask.clear('#000000');
+		mask.add(shape, '#ffffff');
+
+		let size = measurer.measure(mask.getImageData());
+
+		return size;
+	}
+
 	public evaluate(layers: Layer[]): number {
 		let comparer = new Images.Algorithms.ImageComparer();
 		let newImage = new Images.Svg.SvgImage(this.image.width, this.image.height);

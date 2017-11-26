@@ -19,7 +19,7 @@ define("algorithm/genetic-algorithm/genetic-algorithm", ["require", "exports", "
         }
         get currentPopulation() { return this._currentPopulation; }
         set pipeline(value) { this._pipeline = value; }
-        setp() {
+        step() {
             let newPopulation = new population_1.default();
             this._best = null;
             let rootStep = null;
@@ -97,17 +97,36 @@ define("algorithm/images/algorithms/image-comparer", ["require", "exports"], fun
             let diff = 0;
             let bytes = pixels1.length;
             for (let i = 0; i < bytes; i++)
-                diff += Math.pow(Math.abs(pixels1[i] - pixels2[i]) / 256, 2);
+                diff += Math.pow(Math.abs(pixels1[i] - pixels2[i]) / 256, 3);
             return diff / bytes;
         }
     }
     exports.default = ImageComparer;
 });
-define("algorithm/images/algorithms/_index", ["require", "exports", "algorithm/images/algorithms/image-color-selector", "algorithm/images/algorithms/image-comparer"], function (require, exports, image_color_selector_1, image_comparer_1) {
+define("algorithm/images/algorithms/image-measurer", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class ImageMeasurer {
+        measure(image) {
+            let maskPixels = image.data;
+            let bytes = maskPixels.length;
+            let size = 0;
+            for (let i = 0; i < bytes; i += 4) {
+                if (maskPixels[i] || maskPixels[i + 1] || maskPixels[i + 2]) {
+                    size++;
+                }
+            }
+            return size;
+        }
+    }
+    exports.default = ImageMeasurer;
+});
+define("algorithm/images/algorithms/_index", ["require", "exports", "algorithm/images/algorithms/image-color-selector", "algorithm/images/algorithms/image-comparer", "algorithm/images/algorithms/image-measurer"], function (require, exports, image_color_selector_1, image_comparer_1, image_measurer_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ImageColorSelector = image_color_selector_1.default;
     exports.ImageComparer = image_comparer_1.default;
+    exports.ImageMeasurer = image_measurer_1.default;
 });
 define("algorithm/images/svg/_interfaces", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -290,6 +309,19 @@ define("algorithm/svg-processing/evaluation/evaluator", ["require", "exports", "
         constructor(image) {
             this.image = image;
         }
+        compare(image) {
+            let comparer = new _imports_1.Images.Algorithms.ImageComparer();
+            let diff = comparer.compare(this.image, image.getImageData());
+            return diff;
+        }
+        getSize(shape) {
+            let measurer = new _imports_1.Images.Algorithms.ImageMeasurer();
+            let mask = new _imports_1.Images.Svg.SvgImage(this.image.width, this.image.height);
+            mask.clear('#000000');
+            mask.add(shape, '#ffffff');
+            let size = measurer.measure(mask.getImageData());
+            return size;
+        }
         evaluate(layers) {
             let comparer = new _imports_1.Images.Algorithms.ImageComparer();
             let newImage = new _imports_1.Images.Svg.SvgImage(this.image.width, this.image.height);
@@ -338,13 +370,13 @@ define("algorithm/svg-processing/svg-genetic-algorithm", ["require", "exports", 
             }
             return specimen.score;
         }
-        setp() {
+        step() {
             let shapes = this.environment.map(e => e.best.shape);
             this.layers = shapes.map((v, i) => new _index_1.Layer(v, this.evaluator.getLayerColor(shapes, i)));
             for (let i = 0; i < this.environment.length; i++)
                 if (this.environment[i] == this)
                     this.currentLayer = i;
-            super.setp();
+            super.step();
         }
     }
     exports.default = SvgGeneticAlgorithm;
@@ -443,21 +475,38 @@ define("algorithm/genetic-svg", ["require", "exports", "algorithm/images/_index"
                 this.layers.push(ga);
             }
         }
-        step() {
+        *step() {
             for (let layer of this.layers) {
-                layer.setp();
+                this._bestImage = null;
+                this._bestScore = 0;
+                layer.step();
+                yield;
             }
+            //this.sort();
+        }
+        sort() {
+            this.layers = this
+                .layers
+                .map(l => ({ layer: l, size: this.evaluator.getSize(l.best.shape) }))
+                .sort((a, b) => b.size - a.size)
+                .map(l => l.layer);
         }
         get bestImage() {
-            let image = new Image.Svg.SvgImage(this.image.width, this.image.height);
-            image.clear('#ffffff');
-            let shapes = this.layers.map(l => l.best.shape);
-            for (let i = 0; i < shapes.length; i++)
-                image.add(shapes[i], this.evaluator.getLayerColor(shapes, i));
-            return image;
+            if (this._bestImage == null) {
+                let image = new Image.Svg.SvgImage(this.image.width, this.image.height);
+                image.clear('#ffffff');
+                let shapes = this.layers.map(l => l.best.shape);
+                for (let i = 0; i < shapes.length; i++)
+                    image.add(shapes[i], this.evaluator.getLayerColor(shapes, i));
+                this._bestImage = image;
+            }
+            return this._bestImage;
         }
         get bestScore() {
-            return 0;
+            if (!this._bestScore) {
+                this._bestScore = this.evaluator.compare(this.bestImage);
+            }
+            return this._bestScore;
         }
     }
     exports.default = GeneticSvg;
@@ -534,6 +583,57 @@ define("components/_imports", ["require", "exports", "implementation/_index"], f
     Object.defineProperty(exports, "__esModule", { value: true });
     __export(_index_4);
 });
+define("components/algorithm-configuration", ["require", "exports", "react"], function (require, exports, React) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class AlgorithmConfiguration extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = props.configuration;
+            this.setLayers = this.setLayers.bind(this);
+            this.setVertices = this.setVertices.bind(this);
+            this.setAnnealing = this.setAnnealing.bind(this);
+            this.update = this.update.bind(this);
+        }
+        update() {
+            this.props.onChange({
+                layers: Number(this.state.layers),
+                vertices: Number(this.state.vertices),
+                annealing: Number(this.state.annealing),
+                population: Number(this.state.population)
+            });
+        }
+        setLayers(event) { this.setState({ layers: event.target.value }); }
+        setVertices(event) { this.setState({ vertices: event.target.value }); }
+        setAnnealing(event) { this.setState({ annealing: event.target.value }); }
+        componentWillReceiveProps(nextProps) {
+            let oldConfiguration = this.props.configuration;
+            let newConfiguration = nextProps.configuration;
+            if (newConfiguration.layers != oldConfiguration.layers)
+                this.setState({ annealing: newConfiguration.layers });
+            if (newConfiguration.vertices != oldConfiguration.vertices)
+                this.setState({ annealing: newConfiguration.vertices });
+            if (newConfiguration.annealing != oldConfiguration.annealing)
+                this.setState({ annealing: newConfiguration.annealing });
+            if (newConfiguration.population != oldConfiguration.population)
+                this.setState({ annealing: newConfiguration.population });
+        }
+        render() {
+            return (React.createElement("div", null,
+                React.createElement("div", null,
+                    React.createElement("div", null, "layers: "),
+                    React.createElement("input", { type: "text", value: this.state.layers, onChange: this.setLayers })),
+                React.createElement("div", null,
+                    React.createElement("div", null, "vertices: "),
+                    React.createElement("input", { type: "text", value: this.state.vertices, onChange: this.setVertices })),
+                React.createElement("div", null,
+                    React.createElement("div", null, "annealing: "),
+                    React.createElement("input", { type: "text", value: this.state.annealing, onChange: this.setAnnealing })),
+                React.createElement("button", { onClick: this.update }, "Update")));
+        }
+    }
+    exports.default = AlgorithmConfiguration;
+});
 define("components/image-viewer", ["require", "exports", "react"], function (require, exports, React) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -546,38 +646,158 @@ define("components/image-viewer", ["require", "exports", "react"], function (req
                 React.createElement("img", { src: src })));
         }
     }
-    exports.ImageViewer = ImageViewer;
+    exports.default = ImageViewer;
 });
-define("components/algorithm", ["require", "exports", "react", "components/image-viewer", "components/_imports"], function (require, exports, React, image_viewer_1, GA) {
+define("components/flow-control", ["require", "exports", "react"], function (require, exports, React) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class FlowControl extends React.Component {
+        constructor(props) {
+            super(props);
+        }
+        render() {
+            return (React.createElement("div", { className: "flow-control" },
+                React.createElement("button", { onClick: this.props.pause }, "Pause"),
+                React.createElement("button", { onClick: this.props.start }, "Start"),
+                React.createElement("button", { onClick: this.props.reset }, "reset")));
+        }
+    }
+    exports.default = FlowControl;
+});
+define("components/algorithm-log", ["require", "exports", "react"], function (require, exports, React) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class AlgorithmLog extends React.Component {
+        constructor(params) {
+            super(params);
+            this.state = {
+                history: []
+            };
+        }
+        componentWillReceiveProps(nextProps) {
+            if (nextProps.generation != this.props.generation)
+                this.setState({
+                    history: [...this.state.history, this.props]
+                });
+        }
+        render() {
+            let log = this.state.history.map(v => React.createElement("tr", { key: v.generation },
+                React.createElement("td", null, v.generation),
+                React.createElement("td", null, `${v.bestScore.toFixed(6)}`),
+                React.createElement("td", null, v.configuration.annealing),
+                React.createElement("td", null, v.configuration.layers),
+                React.createElement("td", null, v.configuration.population),
+                React.createElement("td", null, v.configuration.vertices)));
+            return (React.createElement("div", { className: "logs" },
+                React.createElement("div", null,
+                    "Generation: ",
+                    this.props.generation),
+                React.createElement("div", null,
+                    "Best score: ",
+                    `${this.props.bestScore.toFixed(6)} (from ${this.props.bestScoreAge} generations)`),
+                React.createElement("div", null,
+                    "Current score: ",
+                    this.props.currentScore.toFixed(6)),
+                React.createElement("table", null,
+                    React.createElement("tr", null,
+                        React.createElement("th", null, "Generation"),
+                        React.createElement("th", null, "Best score"),
+                        React.createElement("th", null, "Annealing"),
+                        React.createElement("th", null, "Layers"),
+                        React.createElement("th", null, "Population"),
+                        React.createElement("th", null, "Vertices")),
+                    log)));
+        }
+    }
+    exports.default = AlgorithmLog;
+});
+define("components/algorithm", ["require", "exports", "react", "components/_imports", "components/algorithm-configuration", "components/image-viewer", "components/flow-control", "components/algorithm-log"], function (require, exports, React, GA, algorithm_configuration_1, image_viewer_1, flow_control_1, algorithm_log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Algorithm extends React.Component {
         constructor(props) {
             super(props);
-            this.setLayers = this._setLayers.bind(this);
-            this.setVertices = this._setVertices.bind(this);
-            this.setAnnealing = this._setAnnealing.bind(this);
             this.state = {
-                generation: -1,
-                paused: false,
-                layers: '40',
-                population: '10',
-                vertices: '4',
-                annealing: '0.5'
+                generation: 0,
+                currentScore: 1,
+                bestScore: 1,
+                bestScoreAge: 0,
+                configuration: {
+                    layers: 30,
+                    population: 10,
+                    vertices: 4,
+                    annealing: 0.5
+                },
+                paused: false
             };
-            this._geneticAlgorithm = new GA.ConfigurableGeneticAlgorithm(props.image, this.getConfiguration());
+            this._geneticAlgorithm = new GA.ConfigurableGeneticAlgorithm(props.image, this.state.configuration);
             this.start = this.start.bind(this);
             this.pause = this.pause.bind(this);
+            this.reset = this.reset.bind(this);
+            this.updateConfiguration = this.updateConfiguration.bind(this);
+            this.algorithmStep = this.algorithmStep.bind(this);
         }
         componentDidMount() {
-            setInterval(this.algorithmStep.bind(this), 1);
+            this.algorithmStep();
         }
         algorithmStep() {
+            //if (!this.state.paused) {
+            //	let generator = this._geneticAlgorithm.step();
+            //
+            //	while (!generator.next().done) { }
+            //
+            //	let score = this._geneticAlgorithm.bestScore;
+            //
+            //	this.addNewScore(score);
+            //}
+            //
+            //setTimeout(this.algorithmStep, 1);
             if (!this.state.paused) {
-                this._geneticAlgorithm.step();
-                this.setState((prevState) => ({
-                    generation: prevState.generation + 1
-                }));
+                let generator = this._geneticAlgorithm.step();
+                let consumer = () => {
+                    if (!generator.next().done) {
+                        //this.setState({});
+                        requestAnimationFrame(consumer);
+                    }
+                    else {
+                        let score = this._geneticAlgorithm.bestScore;
+                        this.addNewScore(score);
+                        requestAnimationFrame(this.algorithmStep);
+                    }
+                };
+                consumer();
+            }
+            else
+                requestAnimationFrame(this.algorithmStep);
+        }
+        addNewScore(score) {
+            if (score < this.state.bestScore) {
+                this.setState({
+                    generation: this.state.generation + 1,
+                    currentScore: score,
+                    bestScore: score,
+                    bestScoreAge: 0
+                });
+            }
+            else if (this.state.bestScoreAge < 10) {
+                this.setState({
+                    generation: this.state.generation + 1,
+                    currentScore: score,
+                    bestScoreAge: this.state.bestScoreAge + 1
+                });
+            }
+            else {
+                this.updateConfiguration({
+                    annealing: this.state.configuration.annealing / 2,
+                    layers: this.state.configuration.layers,
+                    population: this.state.configuration.population,
+                    vertices: this.state.configuration.vertices
+                });
+                this.setState({
+                    generation: this.state.generation + 1,
+                    currentScore: score,
+                    bestScoreAge: 0
+                });
             }
         }
         start() {
@@ -586,46 +806,24 @@ define("components/algorithm", ["require", "exports", "react", "components/image
         pause() {
             this.setState({ paused: true });
         }
-        getConfiguration() {
-            return {
-                annealing: Number(this.state.annealing),
-                layers: Number(this.state.layers),
-                population: Number(this.state.population),
-                vertices: Number(this.state.vertices)
-            };
+        reset() {
         }
-        _setLayers(event) { this.setState({ layers: event.target.value }, () => { this.updateGA(); }); }
-        _setVertices(event) { this.setState({ vertices: event.target.value }, () => { this.updateGA(); }); }
-        _setAnnealing(event) { this.setState({ annealing: event.target.value }, () => { this.updateGA(); }); }
-        updateGA() {
-            this._geneticAlgorithm.updateConfiguration(this.getConfiguration());
+        updateConfiguration(newConfiguration) {
+            this._geneticAlgorithm.updateConfiguration(newConfiguration);
+            this.setState({ configuration: newConfiguration });
         }
         render() {
-            return (React.createElement("div", null,
-                React.createElement("div", null,
-                    React.createElement("button", { onClick: this.start }, "Start"),
-                    React.createElement("button", { onClick: this.pause }, "Pause"),
-                    React.createElement("div", null,
-                        React.createElement("div", null, "layers: "),
-                        React.createElement("input", { type: "text", value: this.state.layers, onChange: this.setLayers })),
-                    React.createElement("div", null,
-                        React.createElement("div", null, "vertices: "),
-                        React.createElement("input", { type: "text", value: this.state.vertices, onChange: this.setVertices })),
-                    React.createElement("div", null,
-                        React.createElement("div", null, "annealing: "),
-                        React.createElement("input", { type: "text", value: this.state.annealing, onChange: this.setAnnealing }))),
-                React.createElement("div", null,
-                    "Generation: ",
-                    this.state.generation),
-                React.createElement("div", null,
-                    "Best score: ",
-                    this._geneticAlgorithm.bestScore),
-                React.createElement(image_viewer_1.ImageViewer, { image: this._geneticAlgorithm.bestImage })));
+            return (React.createElement("div", { className: "algorithm" },
+                React.createElement(image_viewer_1.default, { image: this.props.image }),
+                React.createElement(image_viewer_1.default, { image: this._geneticAlgorithm.bestImage }),
+                React.createElement(algorithm_configuration_1.default, { configuration: this.state.configuration, onChange: this.updateConfiguration }),
+                React.createElement(flow_control_1.default, { paused: this.state.paused, start: this.start, pause: this.pause, reset: this.reset }),
+                React.createElement(algorithm_log_1.default, { generation: this.state.generation, currentScore: this.state.currentScore, bestScore: this.state.bestScore, bestScoreAge: this.state.bestScoreAge, configuration: this.state.configuration })));
         }
     }
-    exports.Algorithm = Algorithm;
+    exports.default = Algorithm;
 });
-define("components/image-selector", ["require", "exports", "react", "components/image-viewer", "components/algorithm", "components/_imports"], function (require, exports, React, image_viewer_2, algorithm_1, SvgGenerator) {
+define("components/image-selector", ["require", "exports", "react", "components/algorithm", "components/_imports"], function (require, exports, React, algorithm_1, SvgGenerator) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class ImageSelector extends React.Component {
@@ -646,8 +844,7 @@ define("components/image-selector", ["require", "exports", "react", "components/
             if (!this.state.ready)
                 return React.createElement("div", null, "Loading image");
             return (React.createElement("div", null,
-                React.createElement(image_viewer_2.ImageViewer, { image: this._image }),
-                React.createElement(algorithm_1.Algorithm, { image: this._image })));
+                React.createElement(algorithm_1.default, { image: this._image })));
         }
     }
     exports.ImageSelector = ImageSelector;

@@ -9,7 +9,7 @@ export interface IPopulation<Specimen extends ISpecimen> {
 
 export interface IGeneticAlgorithm<Specimen extends ISpecimen> {
 	readonly currentPopulation: IPopulation<Specimen>;
-	setp(): void;
+	step(): void;
 	score(specimen: Specimen): number;
 	readonly best: Specimen;
 }
