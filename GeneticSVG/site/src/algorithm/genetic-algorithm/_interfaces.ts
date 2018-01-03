@@ -7,11 +7,18 @@ export interface IPopulation<Specimen extends ISpecimen> {
 	length: number;
 }
 
+export interface Score {
+	max: number;
+	min: number;
+	avg: number;
+}
+
 export interface IGeneticAlgorithm<Specimen extends ISpecimen> {
 	readonly currentPopulation: IPopulation<Specimen>;
 	step(): void;
-	score(specimen: Specimen): number;
+	score(specimen: Specimen, force?: boolean): number;
 	readonly best: Specimen;
+	readonly currentScore: Score;
 }
 
 export interface IPipelineStep<Specimen extends ISpecimen> {

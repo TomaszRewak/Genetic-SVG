@@ -5,6 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>GeneticSVG</Name>
     <RootNamespace>GeneticSVG</RootNamespace>
+    <ToolsVersionPromptShown>2.3</ToolsVersionPromptShown>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -23,7 +24,7 @@
     <NodejsPort>1337</NodejsPort>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
-    <TypeScriptToolsVersion>2.3</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.5</TypeScriptToolsVersion>
     <EnableTypeScript>true</EnableTypeScript>
     <StartWebBrowser>True</StartWebBrowser>
   </PropertyGroup>
@@ -38,6 +39,7 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="public\js\react.js.map" />
+    <Content Include="public\styles\semantic.min.css" />
     <Content Include="public\styles\style.css">
       <SubType>Code</SubType>
     </Content>
@@ -71,10 +73,16 @@
   <ItemGroup>
     <TypeScriptCompile Include="server\src\server.ts" />
     <TypeScriptCompile Include="site\src\algorithm\images\algorithms\image-measurer.ts" />
+    <TypeScriptCompile Include="site\src\algorithm\images\algorithms\image-transform.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\algorithm\images\algorithms\_index.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\algorithm\images\raster\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\images\svg\shapes\bezier-polygon.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\algorithm\images\svg\shapes\_index.ts">
@@ -96,6 +104,9 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\algorithm\svg-processing\evaluation\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\svg-processing\pipeline\bezier-polygon-mutation.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\algorithm\svg-processing\pipeline\polygon-mutation.ts">
@@ -123,6 +134,9 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\algorithm\_index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\algorithm\_interfaces.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\components\algorithm.tsx">
@@ -168,17 +182,25 @@
     <TypeScriptCompile Include="site\src\components\_imports.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\implementation\bezier-polygon-genetic-algorithm.ts" />
     <TypeScriptCompile Include="site\src\implementation\_imports.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\implementation\_index.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="site\src\implementation\_interfaces.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="site\src\site.tsx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="public\js\dependencies.js" />
+    <Compile Include="public\js\jquery.min.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="public\js\react.js" />
+    <Compile Include="public\js\semantic.min.js" />
     <Compile Include="site\src\components\algorithm-configuration.tsx">
       <SubType>Code</SubType>
     </Compile>
@@ -188,7 +210,7 @@
     <Compile Include="site\src\components\algorithm-log.tsx">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="site\src\implementation\configurable-genetic-algorithm.ts">
+    <Compile Include="site\src\implementation\polygon-genetic-algorithm.ts">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

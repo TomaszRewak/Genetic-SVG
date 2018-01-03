@@ -20,7 +20,7 @@ export default class SvgImage implements Images.IImage {
 
 	public add(shape: I.ISvgShape, color: string) {
 		this._context.fillStyle = color;
-		shape.render(this._context);
+		shape.render(this._context, this._canvas.width, this._canvas.height);
 	}
 
 	public get width(): number {

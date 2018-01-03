@@ -12,8 +12,11 @@ export default class SvgGeneticAlgorithm<Shape extends Images.Svg.ISvgShape> ext
 		super(pipeline, initialPopulation);
 	}
 
-	public score(specimen: Specimen<Shape>): number {
-		if (!specimen.scored) {
+	public score(specimen: Specimen<Shape>, force: boolean = false): number {
+		if (!specimen)
+			return 0;
+
+		if (!specimen.scored || force) {
 			let layer = this.layers[this.currentLayer];
 			layer.shape = specimen.shape;
 			layer.color = this.evaluator.getLayerColor(this.layers.map(l => l.shape), this.currentLayer);

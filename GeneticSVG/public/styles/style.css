@@ -1,16 +1,88 @@
 ﻿body {
-	background-color: darkgray;
+	background-color: gainsboro;
 }
 
 .algorithm {
 	display: grid;
 }
 
+	.algorithm > .images-frame {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		margin: 50px;
+	}
+
+@keyframes arrow-backgroung-animation {
+	0% {
+		left: 2px;
+		opacity: 0;
+	}
+
+	25% {
+		left: 10px;
+		opacity: 1;
+	}
+
+	75% {
+		left: 30px;
+		opacity: 1;
+	}
+
+	100% {
+		left: 40px;
+		opacity: 0;
+	}
+}
+
+.algorithm > .images-frame > .image-viewer {
+	border-radius: 10px;
+	overflow: hidden;
+	line-height: 0;
+	box-shadow: rgba(0,0,0,0.1) 2px 2px 2px;
+}
+
+.algorithm > .images-frame > .arrow {
+	width: 54px;
+	height: 14px;
+	position: relative;
+	background-color: rgba(0, 0, 0, 0.2);
+	border-radius: 100px;
+}
+
+	.algorithm > .images-frame > .arrow > div {
+		top: 2px;
+		width: 10px;
+		height: 10px;
+		background-color: rgba(255, 255, 255, 0.5);
+		position: absolute;
+		animation: arrow-backgroung-animation 1s infinite linear;
+		border-radius: 100px;
+	}
+
 .flow-control {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
+	margin: 0 50px 50px 50px !important;
 }
 
-.flow-control > button {
+	.flow-control > button {
+	}
 
+.configuration {
+	margin: 0 50px 50px 50px !important;
 }
+
+.file-form {
+	margin: 50px 50px 0 50px !important;
+}
+
+.logs {
+	margin: 0 50px 50px 50px !important;
+}
+
+	.logs > .logScroll {
+		overflow-y: scroll;
+		height: 500px;
+	}

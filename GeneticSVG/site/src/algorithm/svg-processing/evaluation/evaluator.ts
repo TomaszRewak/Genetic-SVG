@@ -3,10 +3,7 @@
 import Layer from './layer'
 
 export default class Evaluator {
-	public constructor(
-		private image: ImageData
-	) {
-	}
+	public image: ImageData;
 
 	public compare(image: Images.IImage) {
 		let comparer = new Images.Algorithms.ImageComparer();

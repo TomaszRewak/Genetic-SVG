@@ -13,7 +13,7 @@ export default class ImageViewer extends React.Component<Props, State>
 		const src = this.props.image.getCanvas().toDataURL();
 
 		return (
-			<div>
+			<div className="image-viewer">
 				<img src={src} />
 			</div>
 		);

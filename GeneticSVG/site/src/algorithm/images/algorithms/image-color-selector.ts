@@ -19,19 +19,19 @@
 
 		for (let i = 0; i < bytes; i += 4) {
 			if (maskPixels[i] || maskPixels[i + 1] || maskPixels[i + 2]) {
-				colors[0] += imagePixels[i];
-				colors[1] += imagePixels[i + 1];
-				colors[2] += imagePixels[i + 2];
-				colors[3] += imagePixels[i + 3];
+				colors[0] += Math.pow(imagePixels[i], 2);
+				colors[1] += Math.pow(imagePixels[i + 1], 2);
+				colors[2] += Math.pow(imagePixels[i + 2], 2);
+				colors[3] += Math.pow(imagePixels[i + 3], 2);
 
 				inMask++;
 			}
 		}
 
-		colors[0] /= inMask;
-		colors[1] /= inMask;
-		colors[2] /= inMask;
-		colors[3] /= inMask;
+		colors[0] = Math.sqrt(colors[0] / inMask);
+		colors[1] = Math.sqrt(colors[1] / inMask);
+		colors[2] = Math.sqrt(colors[2] / inMask);
+		colors[3] = Math.sqrt(colors[3] / inMask);
 
 		return colors;
 	}

@@ -15,10 +15,10 @@ export default class FlowControl extends React.Component<P, S> {
 
 	public render(): JSX.Element {
 		return (
-			<div className="flow-control">
-				<button onClick={this.props.pause}>Pause</button>
-				<button onClick={this.props.start}>Start</button>
-				<button onClick={this.props.reset}>reset</button>
+			<div className="flow-control ui segment">
+				<button className="ui button" onClick={this.props.pause}>Pause</button>
+				<button className="ui primary button" onClick={this.props.start}>Start</button>
+				<button className="ui red button" onClick={this.props.reset}>reset</button>
 			</div>
 		);
 	}

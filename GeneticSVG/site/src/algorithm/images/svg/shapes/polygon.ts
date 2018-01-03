@@ -1,10 +1,15 @@
 ﻿import * as I from '../_interfaces'
 
+class PolygonPoint {
+	public x: number;
+	public y: number;
+}
+
 export default class Polygon implements I.ISvgShape {
-	private _vertices: Float32Array;
+	private _vertices: PolygonPoint[];
 
 	public constructor(public readonly length: number) {
-		this._vertices = new Float32Array(length * 2);
+		this._vertices = [...Array(length)].map(v => new PolygonPoint());
 	}
 
 	private roundIndex(index: number): number {
@@ -12,32 +17,23 @@ export default class Polygon implements I.ISvgShape {
 		return ((index % length) + length) % length;
 	}
 
-	public setX(index: number, value: number): void {
-		this._vertices[this.roundIndex(index) * 2] = value;
+	public getPoint(index: number): PolygonPoint {
+		return this._vertices[this.roundIndex(index)];
 	}
 
-	public setY(index: number, value: number): void {
-		this._vertices[this.roundIndex(index) * 2 + 1] = value;
-	}
-
-	public getX(index: number): number {
-		return this._vertices[this.roundIndex(index) * 2];
-	}
-
-	public getY(index: number): number {
-		return this._vertices[this.roundIndex(index) * 2 + 1];
-	}
-
-	public render(context: CanvasRenderingContext2D): void {
+	public render(context: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number): void {
 		let vertices = this._vertices;
 		let length = vertices.length;
 
 		context.beginPath();
 
-		context.moveTo(vertices[0], vertices[1]);
+		context.moveTo(
+			vertices[0].x * canvasWidth,
+			vertices[0].y * canvasHeight
+		);
 
-		for (let i = 2; i < length; i += 2)
-			context.lineTo(vertices[i], vertices[i + 1]);
+		for (let i = 1; i < length; i++)
+			context.lineTo(vertices[i].x * canvasWidth, vertices[i].y * canvasHeight);
 
 		context.closePath();
 		context.fill();

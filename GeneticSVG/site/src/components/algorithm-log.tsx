@@ -4,9 +4,8 @@ import * as GA from './_imports'
 
 type P = {
 	generation: number,
-	currentScore: number,
-	bestScore: number,
-	bestScoreAge: number,
+	currentTotalScore: number,
+	currentLayerScore: GA.GeneticSvgScore,
 	configuration: GA.GeneticSvgConfiguration
 };
 type S = {
@@ -33,7 +32,10 @@ export default class AlgorithmLog extends React.Component<P, S> {
 		let log = this.state.history.map(v =>
 			<tr key={v.generation}>
 				<td>{v.generation}</td>
-				<td>{`${v.bestScore.toFixed(6)}`}</td>
+				<td>{`${v.currentTotalScore.toFixed(6)}`}</td>
+				<td>{`${v.currentLayerScore.min.toFixed(6)}`}</td>
+				<td>{`${v.currentLayerScore.avg.toFixed(6)}`}</td>
+				<td>{`${v.currentLayerScore.max.toFixed(6)}`}</td>
 				<td>{v.configuration.annealing}</td>
 				<td>{v.configuration.layers}</td>
 				<td>{v.configuration.population}</td>
@@ -42,21 +44,29 @@ export default class AlgorithmLog extends React.Component<P, S> {
 		);
 
 		return (
-			<div className="logs">
-				<div>Generation: {this.props.generation}</div>
-				<div>Best score: {`${this.props.bestScore.toFixed(6)} (from ${this.props.bestScoreAge} generations)`}</div>
-				<div>Current score: {this.props.currentScore.toFixed(6)}</div>
-				<table>
-					<tr>
-						<th>Generation</th>
-						<th>Best score</th>
-						<th>Annealing</th>
-						<th>Layers</th>
-						<th>Population</th>
-						<th>Vertices</th>
-					</tr>
-					{log}
-				</table>
+			<div className="ui segment logs">
+				<h3 className="ui header">Generation: {this.props.generation}</h3>
+				<h3 className="ui header">Current score: {this.props.currentTotalScore.toFixed(6)}</h3>
+				<div className="logScroll">
+					<table className="ui celled table">
+						<thead>
+							<tr>
+								<th>Generation</th>
+								<th>Total score</th>
+								<th>Min score</th>
+								<th>Avg score</th>
+								<th>Max score</th>
+								<th>Annealing</th>
+								<th>Layers</th>
+								<th>Population</th>
+								<th>Vertices</th>
+							</tr>
+						</thead>
+						<tbody>
+							{log}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		);
 	}

@@ -19,6 +19,7 @@ export default abstract class GeneticAlgorithm<Specimen extends I.ISpecimen> imp
 	public step(): void {
 		let newPopulation = new Population<Specimen>();
 		this._best = null;
+		this.score(this.allTimeBest, true);
 
 		let rootStep: I.IPipelineStep<Specimen> = null;
 		for (let step of this._pipeline)
@@ -30,9 +31,13 @@ export default abstract class GeneticAlgorithm<Specimen extends I.ISpecimen> imp
 
 			if (this._best == null || this.score(newSpecimen) < this.score(this._best))
 				this._best = newSpecimen;
+
+			if (this._allTimeBest == null || this.score(this.best) < this.score(this._allTimeBest))
+				this._allTimeBest = this._best;
 		}
 
 		this._currentPopulation = newPopulation;
+		this.calculateCurrentScore();
 	}
 
 	private _best: Specimen;
@@ -40,5 +45,39 @@ export default abstract class GeneticAlgorithm<Specimen extends I.ISpecimen> imp
 		return this._best ? this._best : this.currentPopulation[0];
 	}
 
-	public abstract score(specimen: Specimen): number;
+	private _allTimeBest: Specimen;
+	public get allTimeBest(): Specimen {
+		return this._allTimeBest ? this._allTimeBest : this.best;
+	}
+
+	public abstract score(specimen: Specimen, force?: boolean): number;
+
+	private _currentScore: I.Score = {
+		min: 0,
+		max: 0,
+		avg: 0
+	}
+	private calculateCurrentScore() {
+		let score = {
+			min: Number.MAX_VALUE,
+			max: Number.MIN_VALUE,
+			avg: 0
+		}
+
+		for (let i = 0; i < this._currentPopulation.length; i++) {
+			let specimenScore = this.score(this._currentPopulation[i]);
+
+			score.min = Math.min(score.min, specimenScore);
+			score.max = Math.max(score.max, specimenScore);
+			score.avg += specimenScore;
+		}
+
+		score.avg /= this._currentPopulation.length;
+
+		this._currentScore = score;
+	}
+
+	public get currentScore(): I.Score {
+		return this._currentScore;
+	}
 }
